@@ -6,6 +6,7 @@ class NotSharkApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Not Shark',
       theme: ThemeData(
         primarySwatch: Colors.blue,
