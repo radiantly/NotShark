@@ -116,10 +116,7 @@ Widget loginFormField(
         return null;
       },
       decoration: InputDecoration(
-          border: OutlineInputBorder(),
-          labelText: label,
-          hintStyle: TextStyle(color: Colors.white60),
-          helperText: helpText),
+          border: OutlineInputBorder(), labelText: label, helperText: helpText),
     ),
   );
 }
