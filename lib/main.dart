@@ -62,6 +62,9 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               SizedBox(
+                height: MediaQuery.of(context).size.height*0.02,
+              ),
+              SizedBox(
                 width: MediaQuery.of(context).size.width * 0.9,
                 child: Column(
                   children: [
@@ -79,10 +82,16 @@ class HomePage extends StatelessWidget {
                     SizedBox(
                       height: MediaQuery.of(context).size.height * 0.02,
                     ),
-                    Text(
-                      "Enter the secret username",
-                      style: TextStyle(color: Colors.white60),
+                    SizedBox(
+                      child: Padding(
+                        padding: EdgeInsets.only(right: MediaQuery.of(context).size.width*0.55),
+                        child: Text(
+                          "Enter the secret username",
+                          style: TextStyle(color: Colors.white60),
+                        ),
+                      ),
                     ),
+
                     SizedBox(
                       height: MediaQuery.of(context).size.height * 0.05,
                     ),
@@ -101,10 +110,14 @@ class HomePage extends StatelessWidget {
                     SizedBox(
                       height: MediaQuery.of(context).size.height * 0.02,
                     ),
-                    Text(
-                      "Enter the secret username",
-                      style: TextStyle(color: Colors.white60),
-                      textAlign: TextAlign.start,
+                    SizedBox(
+                      child: Padding(
+                        padding: EdgeInsets.only(right: MediaQuery.of(context).size.width*0.55),
+                        child: Text(
+                          "Enter the secret username",
+                          style: TextStyle(color: Colors.white60),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -123,7 +136,7 @@ class HomePage extends StatelessWidget {
                     ),
                   )),
               SizedBox(
-                height: MediaQuery.of(context).size.height*0.2,
+                height: MediaQuery.of(context).size.height*0.15,
               ),
               SizedBox(
                 child: Padding(
