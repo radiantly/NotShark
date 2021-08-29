@@ -41,14 +41,14 @@ abstract class Classifier {
       _interpreterOptions.threads = numThreads;
     }
 
-    loadModel();
-    loadLabels();
+    // loadModel();
+    // loadLabels();
   }
 
   Future<void> loadModel() async {
+    print("Is load model running");
     try {
-      interpreter =
-          await Interpreter.fromAsset(modelName, options: _interpreterOptions);
+      interpreter = await Interpreter.fromAsset("shark_classifier.tflite");
       print('Interpreter Created Successfully');
 
       _inputShape = interpreter.getInputTensor(0).shape;
@@ -85,17 +85,50 @@ abstract class Classifier {
         .process(_inputImage);
   }
 
-  Category predict(Image image) {
+  Future<Category> predict(Image image) async {
+    // await loadModel();
+    await loadLabels();
     final pres = DateTime.now().millisecondsSinceEpoch;
-    _inputImage = TensorImage(_inputType);
-    _inputImage.loadImage(image);
-    _inputImage = _preProcess();
+    ImageProcessor imageProcessor = ImageProcessorBuilder()
+        .add(ResizeOp(300, 300, ResizeMethod.NEAREST_NEIGHBOUR))
+        .build();
+
+// Create a TensorImage object from a File
+    TensorImage tensorImage = TensorImage.fromImage(image);
+
+// Preprocess the image.
+// The image for imageFile will be resized to (224, 224)
+    tensorImage = imageProcessor.process(tensorImage);
+    // _inputImage = TensorImage(_inputType);
+    // print("hello world");
+    // _inputImage.loadImage(image);
+    // _inputImage = _preProcess();
     final pre = DateTime.now().millisecondsSinceEpoch - pres;
 
     print('Time to load image: $pre ms');
 
     final runs = DateTime.now().millisecondsSinceEpoch;
-    interpreter.run(_inputImage.buffer, _outputBuffer.getBuffer());
+
+    interpreter = await Interpreter.fromAsset("shark_classifier.tflite");
+    print('Interpreter Created Successfully');
+
+    _inputShape = interpreter.getInputTensor(0).shape;
+    _outputShape = interpreter.getOutputTensor(0).shape;
+    _inputType = interpreter.getInputTensor(0).type;
+    _outputType = interpreter.getOutputTensor(0).type;
+
+    print(_inputShape);
+    print(_outputShape);
+    print(_inputType);
+    print(_outputType);
+
+    _outputBuffer = TensorBuffer.createFixedSize(_outputShape, _outputType);
+    _probabilityProcessor =
+        TensorProcessorBuilder().add(postProcessNormalizeOp).build();
+
+    print(tensorImage.buffer);
+
+    interpreter.run(tensorImage.buffer, _outputBuffer.getBuffer());
     final run = DateTime.now().millisecondsSinceEpoch - runs;
 
     print('Time to run inference: $run ms');

@@ -94,7 +94,9 @@ class CameraScreenState extends State<CameraScreen> {
                           image = imageLib.decodeImage(
                               File(imageXFile.path).readAsBytesSync());
 
-                          final cat = ClassifierFloat().predict(image);
+                          print("Am I even running?");
+                          final cat = await ClassifierFloat().predict(image);
+                          print("Am I even running Sequel?");
                           print(cat);
 
                           // If the picture was taken, display it on a new screen.
