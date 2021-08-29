@@ -2,7 +2,27 @@ import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'globals.dart' as globals;
+
+// import 'result_screen.dart';
+import 'dart:io';
+import 'classifier.dart';
+
+import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
+import 'package:image/image.dart' as imageLib;
 import 'result_screen.dart';
+
+class ClassifierFloat extends Classifier {
+  ClassifierFloat({int? numThreads}) : super(numThreads: numThreads);
+
+  @override
+  String get modelName => 'shark_classifier.tflite';
+
+  @override
+  NormalizeOp get preProcessNormalizeOp => NormalizeOp(127.5, 127.5);
+
+  @override
+  NormalizeOp get postProcessNormalizeOp => NormalizeOp(0, 1);
+}
 
 class CameraScreen extends StatefulWidget {
   @override
@@ -64,21 +84,35 @@ class CameraScreenState extends State<CameraScreen> {
                         // Take the Picture in a try / catch block. If anything goes wrong,
                         // catch the error.
                         try {
+                          final snackbar = SnackBar(
+                            content: const Text('Processing...'),
+                          );
+
+                          // Scaffold.
+                          ScaffoldMessenger.of(context).showSnackBar(snackbar);
+
                           // Ensure that the camera is initialized.
                           await _initializeControllerFuture;
 
                           // Attempt to take a picture and get the file `image`
                           // where it was saved.
-                          final image = await _controller.takePicture();
+                          final imageXFile = await _controller.takePicture();
+
+                          late final image;
+                          image = imageLib.decodeImage(
+                              File(imageXFile.path).readAsBytesSync());
+
+                          final answer = await ClassifierFloat().predict(image);
+                          print(answer);
 
                           // If the picture was taken, display it on a new screen.
                           await Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => ResultScreen(
-                                // Pass the automatically generated path to
-                                // the DisplayPictureScreen widget.
-                                imagePath: image.path,
-                              ),
+                                  // Pass the automatically generated path to
+                                  // the DisplayPictureScreen widget.
+                                  imagePath: imageXFile.path,
+                                  result: answer == "Shark"),
                             ),
                           );
                         } catch (e) {
