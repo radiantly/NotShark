@@ -2,7 +2,26 @@ import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'globals.dart' as globals;
-import 'result_screen.dart';
+
+// import 'result_screen.dart';
+import 'dart:io';
+import 'classifier.dart';
+
+import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
+import 'package:image/image.dart' as imageLib;
+
+class ClassifierFloat extends Classifier {
+  ClassifierFloat({int? numThreads}) : super(numThreads: numThreads);
+
+  @override
+  String get modelName => 'shark_classifier.tflite';
+
+  @override
+  NormalizeOp get preProcessNormalizeOp => NormalizeOp(127.5, 127.5);
+
+  @override
+  NormalizeOp get postProcessNormalizeOp => NormalizeOp(0, 1);
+}
 
 class CameraScreen extends StatefulWidget {
   @override
@@ -69,18 +88,25 @@ class CameraScreenState extends State<CameraScreen> {
 
                           // Attempt to take a picture and get the file `image`
                           // where it was saved.
-                          final image = await _controller.takePicture();
+                          final imageXFile = await _controller.takePicture();
+
+                          late final image;
+                          image = imageLib.decodeImage(
+                              File(imageXFile.path).readAsBytesSync());
+
+                          final cat = ClassifierFloat().predict(image);
+                          print(cat);
 
                           // If the picture was taken, display it on a new screen.
-                          await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => ResultScreen(
-                                // Pass the automatically generated path to
-                                // the DisplayPictureScreen widget.
-                                imagePath: image.path,
-                              ),
-                            ),
-                          );
+                          // await Navigator.of(context).push(
+                          //   MaterialPageRoute(
+                          //     builder: (context) => ResultScreen(
+                          //       // Pass the automatically generated path to
+                          //       // the DisplayPictureScreen widget.
+                          //       imagePath: image.path,
+                          //     ),
+                          //   ),
+                          // );
                         } catch (e) {
                           // If an error occurs, log the error to the console.
                           print(e);
