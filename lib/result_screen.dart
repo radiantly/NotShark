@@ -5,7 +5,9 @@ import 'dart:io';
 // A widget that displays the picture taken by the user.
 class ResultScreen extends StatelessWidget {
   final String imagePath;
-  const ResultScreen({Key? key, required this.imagePath}) : super(key: key);
+  final bool result;
+  const ResultScreen({Key? key, required this.imagePath, required this.result})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +32,7 @@ class ResultScreen extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                "NOT SHARK",
+                this.result ? "SHARK" : "NOT SHARK",
                 style: GoogleFonts.montserrat(
                   textStyle: TextStyle(fontSize: 35),
                   fontWeight: FontWeight.w700,
@@ -44,7 +46,8 @@ class ResultScreen extends StatelessWidget {
               width: 80,
               height: 80,
               margin: EdgeInsets.only(top: 160),
-              child: Image.asset('assets/x.png'),
+              child: Image.asset(
+                  this.result ? 'assets/check.png' : 'assets/x.png'),
             ),
           )
         ],

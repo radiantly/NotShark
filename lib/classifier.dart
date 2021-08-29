@@ -78,36 +78,24 @@ abstract class Classifier {
     int cropSize = min(_inputImage.height, _inputImage.width);
     return ImageProcessorBuilder()
         .add(ResizeWithCropOrPadOp(cropSize, cropSize))
-        .add(ResizeOp(
-            _inputShape[1], _inputShape[2], ResizeMethod.NEAREST_NEIGHBOUR))
+        .add(ResizeOp(300, 300, ResizeMethod.NEAREST_NEIGHBOUR))
         .add(preProcessNormalizeOp)
         .build()
         .process(_inputImage);
   }
 
-  Future<Category> predict(Image image) async {
-    // await loadModel();
-    await loadLabels();
-    final pres = DateTime.now().millisecondsSinceEpoch;
-    ImageProcessor imageProcessor = ImageProcessorBuilder()
-        .add(ResizeOp(300, 300, ResizeMethod.NEAREST_NEIGHBOUR))
-        .build();
+  //   TensorImage _preProcess2(Image inputImg) {
+  //   int cropSize = min(inputImg.height, inputImg.width);
+  //   return ImageProcessorBuilder()
+  //       .add(ResizeWithCropOrPadOp(cropSize, cropSize))
+  //       .add(ResizeOp(300, 300, ResizeMethod.NEAREST_NEIGHBOUR))
+  //       .add(preProcessNormalizeOp)
+  //       .build()
+  //       .process(inputImg);
+  // }
 
-// Create a TensorImage object from a File
-    TensorImage tensorImage = TensorImage.fromImage(image);
-
-// Preprocess the image.
-// The image for imageFile will be resized to (224, 224)
-    tensorImage = imageProcessor.process(tensorImage);
-    // _inputImage = TensorImage(_inputType);
-    // print("hello world");
-    // _inputImage.loadImage(image);
-    // _inputImage = _preProcess();
-    final pre = DateTime.now().millisecondsSinceEpoch - pres;
-
-    print('Time to load image: $pre ms');
-
-    final runs = DateTime.now().millisecondsSinceEpoch;
+  Future<String> predict(Image image) async {
+    // Load Model
 
     interpreter = await Interpreter.fromAsset("shark_classifier.tflite");
     print('Interpreter Created Successfully');
@@ -126,19 +114,47 @@ abstract class Classifier {
     _probabilityProcessor =
         TensorProcessorBuilder().add(postProcessNormalizeOp).build();
 
-    print(tensorImage.buffer);
+    // Load labels
+    await loadLabels();
 
-    interpreter.run(tensorImage.buffer, _outputBuffer.getBuffer());
+    // Load image
+
+    final pres = DateTime.now().millisecondsSinceEpoch;
+//     ImageProcessor imageProcessor = ImageProcessorBuilder()
+//         .add(ResizeOp(300, 300, ResizeMethod.NEAREST_NEIGHBOUR))
+//         .build();
+
+// // Create a TensorImage object from a File
+//     TensorImage tensorImage = TensorImage.fromImage(image);
+
+// Preprocess the image.
+// The image for imageFile will be resized to (224, 224)
+    // tensorImage = imageProcessor.process(tensorImage);
+    _inputImage = TensorImage(_inputType);
+    // print("hello world");
+    _inputImage.loadImage(image);
+    _inputImage = _preProcess();
+    final pre = DateTime.now().millisecondsSinceEpoch - pres;
+
+    print('Time to load image: $pre ms');
+
+    final runs = DateTime.now().millisecondsSinceEpoch;
+
+    // print(tensorImage.buffer);
+
+    interpreter.run(_inputImage.buffer, _outputBuffer.getBuffer());
+    // interpreter.run(tensorImage.buffer, _outputBuffer.getBuffer());
     final run = DateTime.now().millisecondsSinceEpoch - runs;
 
     print('Time to run inference: $run ms');
+    final ans = _probabilityProcessor.process(_outputBuffer).getDoubleList()[0];
 
-    Map<String, double> labeledProb = TensorLabel.fromList(
-            labels, _probabilityProcessor.process(_outputBuffer))
-        .getMapWithFloatValue();
-    final pred = getTopProbability(labeledProb);
+    // Map<String, double> labeledProb = TensorLabel.fromList(
+    //         labels, _probabilityProcessor.process(_outputBuffer))
+    //     .getMapWithFloatValue();
+    // final pred = getTopProbability(labeledProb);
 
-    return Category(pred.key, pred.value);
+    return ans == 1 ? "Shark" : "Not Shark";
   }
 
   void close() {

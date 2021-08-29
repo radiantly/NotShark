@@ -9,6 +9,7 @@ import 'classifier.dart';
 
 import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
 import 'package:image/image.dart' as imageLib;
+import 'result_screen.dart';
 
 class ClassifierFloat extends Classifier {
   ClassifierFloat({int? numThreads}) : super(numThreads: numThreads);
@@ -83,6 +84,13 @@ class CameraScreenState extends State<CameraScreen> {
                         // Take the Picture in a try / catch block. If anything goes wrong,
                         // catch the error.
                         try {
+                          final snackbar = SnackBar(
+                            content: const Text('Processing...'),
+                          );
+
+                          // Scaffold.
+                          ScaffoldMessenger.of(context).showSnackBar(snackbar);
+
                           // Ensure that the camera is initialized.
                           await _initializeControllerFuture;
 
@@ -94,21 +102,19 @@ class CameraScreenState extends State<CameraScreen> {
                           image = imageLib.decodeImage(
                               File(imageXFile.path).readAsBytesSync());
 
-                          print("Am I even running?");
-                          final cat = await ClassifierFloat().predict(image);
-                          print("Am I even running Sequel?");
-                          print(cat);
+                          final answer = await ClassifierFloat().predict(image);
+                          print(answer);
 
                           // If the picture was taken, display it on a new screen.
-                          // await Navigator.of(context).push(
-                          //   MaterialPageRoute(
-                          //     builder: (context) => ResultScreen(
-                          //       // Pass the automatically generated path to
-                          //       // the DisplayPictureScreen widget.
-                          //       imagePath: image.path,
-                          //     ),
-                          //   ),
-                          // );
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ResultScreen(
+                                  // Pass the automatically generated path to
+                                  // the DisplayPictureScreen widget.
+                                  imagePath: image.path,
+                                  result: answer == "Shark"),
+                            ),
+                          );
                         } catch (e) {
                           // If an error occurs, log the error to the console.
                           print(e);

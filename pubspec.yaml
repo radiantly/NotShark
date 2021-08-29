@@ -34,6 +34,7 @@ dependencies:
 
   tflite_flutter:
   tflite_flutter_helper:
+  image:
 
 dev_dependencies:
   flutter_test:
