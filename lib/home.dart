@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'camera_screen.dart';
 import 'package:not_shark/meme.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'globals.dart' as globals;
 
 class HomePage extends StatelessWidget {
   @override
@@ -86,6 +87,7 @@ class LoginFormState extends State<LoginForm> {
           ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
+                  globals.prefs.setBool("loggedIn", true);
                   Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context) => CameraScreen()));
                 }

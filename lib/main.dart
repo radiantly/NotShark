@@ -4,10 +4,13 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'globals.dart' as globals;
 import 'home.dart';
+import 'camera_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   globals.cameras = await availableCameras();
+  globals.prefs = await SharedPreferences.getInstance();
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -30,7 +33,9 @@ class NotSharkApp extends StatelessWidget {
         accentColor: Colors.white,
         primarySwatch: Colors.lightGreen,
       ),
-      home: HomePage(),
+      home: globals.prefs.getBool("loggedIn") ?? false
+          ? CameraScreen()
+          : HomePage(),
     );
   }
 }

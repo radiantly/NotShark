@@ -13,14 +13,46 @@ class ResultScreen extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Image.file(File(imagePath)),
-            ],
-          ),
           Container(
-            height: 200,
+              padding: EdgeInsets.only(bottom: 60),
+              margin: EdgeInsets.only(top: 130),
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  fit: BoxFit.fill,
+                  image: FileImage(File(imagePath)),
+                ),
+              ),
+              constraints: BoxConstraints.expand(),
+              child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(Color(0xff22232d)),
+                        foregroundColor:
+                            MaterialStateProperty.all(Colors.white),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                "SCAN AGAIN",
+                                style: GoogleFonts.montserrat(
+                                  textStyle: TextStyle(fontSize: 30),
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              Icon(Icons.arrow_forward_ios)
+                            ]),
+                      )))),
+          Container(
+            height: 150,
             decoration: BoxDecoration(
               color: const Color(0xff22232d),
               borderRadius: BorderRadius.only(
@@ -45,7 +77,7 @@ class ResultScreen extends StatelessWidget {
             child: Container(
               width: 80,
               height: 80,
-              margin: EdgeInsets.only(top: 160),
+              margin: EdgeInsets.only(top: 110),
               child: Image.asset(
                   this.result ? 'assets/check.png' : 'assets/x.png'),
             ),
