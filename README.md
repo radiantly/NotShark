@@ -6,9 +6,7 @@ The flutter app along with the final model resides in this repository, while you
 
 Inspired by the Not Hotdog App from the Silicon Valley TV series.
 
-<img src="demo/screen.png" width="150">
-<img src="demo/not.png" width="150">
-<img src="demo/yes.png" width="150">
+<img src="demo/screen.png" width="150"> <img src="demo/not.png" width="150"> <img src="demo/yes.png" width="150">
 
 ### Built by
 
